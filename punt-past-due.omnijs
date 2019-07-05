@@ -1,0 +1,48 @@
+/*{
+  "type": "action",
+  "targets": ["omnifocus"],
+  "author": "Douglas Beal",
+  "identifier": "ws.murderofcro",
+  "version": "1.0",
+  "description": "move due date into the future",
+  "label": "Punt Past Due",
+  "shortLabel": "Punt Past Due"
+  }*/
+
+var _ = function() {
+
+        var action = new PlugIn.Action(function(selection) {
+            // Add code to run when the action is invoked
+            console.log("Invoked with selection (here)", selection);
+            console.log(Task.Status.all);
+            var targetTasks = new Array();
+            console.log( "tag count " + tags.length );
+            tags.apply(function(tag) {
+                console.log( "task count " + tag.tasks.length );
+                for (var i in tag.tasks) {
+                    task = tag.tasks[i];
+                    console.log(task.taskStatus);
+                    console.log(Task.Status.Overdue);
+                    if (task.taskStatus === Task.Status.Overdue) {
+                        console.log(task);
+                        console.log(task.taskStatus);
+                        targetTasks.push(task);
+                    }
+
+                }
+                return ApplyResult;
+            });
+            console.log(targetTasks);
+            console.log("done");
+        });
+
+    // If needed, uncomment, and add a function that returns true if the current selection is appropriate for the action.
+/*
+    action.validate = function(selection){
+
+    };
+*/
+
+        return action;
+}();
+_;
