@@ -9,6 +9,15 @@
   "shortLabel": "Punt Past Due"
   }*/
 
+/*
+  time classes
+- past due => Day
+- Day but untouched over 7 days  => Days
+- Days but uncouched over 14 days => Weeks
+- Weeks but untouched over 30 days => Months
+- Months but untouched over 120 days => Years
+- also multitag (offer selection?)
+*/
 var _ = function() {
 
         var action = new PlugIn.Action(function(selection) {
