@@ -25,10 +25,47 @@ function taskToObj(task) {
     obj.name = task.name;
     obj.type = "task";
     obj.children = task.children.map(taskToObj);
-    obj.status = task.taskStatus;
-    return obj;    
+    obj.status = statusToString(task.taskStatus);
+    return obj;
 }
 
+// [object Task.Status: Blocked],[object Task.Status: Available],[object Task.Status: Next],[object Task.Status: Completed],[object Task.Status: DueSoon],[object Task.Status: Overdue],[object Task.Status: Dropped]
+// ;; Original keys: C-s [ C-a C-d C-s ] C-b RET 2*C-d C-p C-a TAB M-d TAB 2*M-f C-d . C-d C-a TAB case SPC C-e : M-b M-d C-/ C-e RET " C-y " 2*M-b C-n RET break; C-p C-e ; 7*C-b C-a TAB str SPC = SPC C-n RET C-n C-a
+function statusToString(status) {
+    var str = "No Match";
+    switch (status) {
+
+    case Task.Status.Blocked:
+        str = "Blocked";
+        break;
+
+    case Task.Status.Available:
+        str = "Available";
+        break;
+
+    case Task.Status.Next:
+        str = "Next";
+        break;
+
+    case Task.Status.Completed:
+        str = "Completed";
+        break;
+
+    case Task.Status.DueSoon:
+        str = "DueSoon";
+        break;
+
+    case Task.Status.Overdue:
+        str = "Overdue";
+        break;
+
+    case Task.Status.Dropped:
+        str = "Dropped";
+        break;
+
+    }
+    return str;
+}
 function body(tagName) {
     objs = {};
     topTag = tagNamed(tagName);
@@ -43,16 +80,16 @@ function body(tagName) {
 }
 
 var _ = function() {
-    
+
     var action = new PlugIn.Action((selection)=>{
         // Add code to run when the action is invoked
         objs = body("Indieweb");
         json = JSON.stringify(objs);
         console.log(json);
         console.log("done");
-        
+
     });
-    
+
     // If needed, uncomment, and add a function that returns true if the current selection is appropriate for the action.
 /*
     action.validate = function(selection){
