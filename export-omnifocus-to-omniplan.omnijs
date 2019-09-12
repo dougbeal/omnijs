@@ -1,0 +1,131 @@
+/*{
+  "type": "action",
+  "targets": ["omnifocus"],
+  "author": "Douglas Beal",
+  "identifier": "ws.murderofcro.omnifocus.export.to.omniplan",  
+  "version": "1.1.6",
+  "description": "export Folder OmniPlan to OmniPlan",
+  "label": "Export to OmniPlan",
+  "shortLabel": "Export to OmniPlan",
+
+  }*/
+
+/*
+  identifier needs to be unique
+  match versions with import-omnifocus-to-omniplan.omnijs library
+*/
+function convertDatebaseObject(dbo){
+    var obj = {}
+    var name = dbo.constructor.name;
+    console.log("converting " + name);
+    switch(name) {
+    case "Folder":
+        obj.children = dbo.children.map(convertDatebaseObject);                
+        break;
+    case "Tag":
+        obj.tasks =  dbo.tasks.map(convertDatebaseObject);
+        obj.children = dbo.children.map(convertDatebaseObject);        
+        break;
+    case "Task":
+        obj.children = dbo.children.map(convertDatebaseObject);
+        obj.status = taskStatusToString(dbo.taskStatus);        
+        break;
+    case "Project":
+        obj.children = convertDatebaseObject(dbo.task).children;        
+        obj.status = projectStatusToString(dbo.status);                
+        break;
+    default:
+        console.log("don't know how to convert " + name);
+        return null;
+    }
+    obj.type = name;
+    obj.id = dbo.id.primaryKey;
+    obj.name = dbo.name;
+    return obj;
+}
+
+
+function projectStatusToString(status) {
+    console.log(Project.Status.all.lastIndexOf(status));
+    return "";
+}
+// [object Task.Status: Blocked],[object Task.Status: Available],[object Task.Status: Next],[object Task.Status: Completed],[object Task.Status: DueSoon],[object Task.Status: Overdue],[object Task.Status: Dropped]
+// ;; Original keys: C-s [ C-a C-d C-s ] C-b RET 2*C-d C-p C-a TAB M-d TAB 2*M-f C-d . C-d C-a TAB case SPC C-e : M-b M-d C-/ C-e RET " C-y " 2*M-b C-n RET break; C-p C-e ; 7*C-b C-a TAB str SPC = SPC C-n RET C-n C-a
+function taskStatusToString(status) {
+    var str = "No Match";
+    switch (status) {
+
+    case Task.Status.Blocked:
+        str = "Blocked";
+        break;
+
+    case Task.Status.Available:
+        str = "Available";
+        break;
+
+    case Task.Status.Next:
+        str = "Next";
+        break;
+
+    case Task.Status.Completed:
+        str = "Completed";
+        break;
+
+    case Task.Status.DueSoon:
+        str = "DueSoon";
+        break;
+
+    case Task.Status.Overdue:
+        str = "Overdue";
+        break;
+
+    case Task.Status.Dropped:
+        str = "Dropped";
+        break;
+
+    }
+    return str;
+}
+function body(tagName) {
+    objs = {};
+    topTag = tagNamed(tagName);
+    if( topTag ) {
+        objs = tagToObj(topTag);
+    } else
+    {
+        console.log("failed to find tag " + tagName);
+    }
+
+    return objs;
+}
+
+var _ = function() {
+
+    var action = new PlugIn.Action((selection, sender)=>{
+        if( selection.folders.length == 1 ) {
+            dbobjs = selection.folders[0];
+            objs = convertDatebaseObject(dbobjs);
+            
+            json = JSON.stringify(objs);
+            console.log(json);
+
+            
+            
+            let omniplanScript = URL.tellScript("omniplan", "ws.murderofcro.expirt.to.OmniPlan.fromOmnifocus()", taskNames);
+
+        // console.log("omniplanScript = " + omniplanScript);
+        // omniplanScript.call((reply) => {
+        //     console.log("OmniPlan returned: " + reply);
+            console.log("done");
+        }
+
+    });
+
+    action.validate = function(selection){
+        console.log("export-omnifocus-to-omniplan validating, folders " + selection.folders.length);        
+        return selection.folders.length == 1;
+    };
+
+    return action;
+}();
+_;

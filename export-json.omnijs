@@ -2,7 +2,7 @@
   "type": "action",
   "targets": ["omnifocus"],
   "author": "Douglas Beal",
-  "identifier": "ws.murderofcro",
+  "identifier": "ws.murderofcro.export.json",
   "version": "1.3",
   "description": "export tasks as json",
   "label": "Export JSON",
@@ -15,7 +15,7 @@ function tagToObj(tag) {
     obj.name = tag.name;
     obj.type = "tag";
     obj.children = tag.children.map(tagToObj);
-    obj.tasks =  tag.tasks.map(taskToObj);
+    obj.tas =  tag.tasks.map(taskToObj);
     return obj;
 }
 
