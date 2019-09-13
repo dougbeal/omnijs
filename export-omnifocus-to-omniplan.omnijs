@@ -110,13 +110,12 @@ var _ = function() {
             console.log(json);
 
             
+            encoded = encodeURIComponent(json);
+            let opFunction = URL.tellScript("omniplan", "ws.murderofcro.omniplan.import.fromOmnifocus()", encoded);
             
-            let omniplanScript = URL.tellScript("omniplan", "ws.murderofcro.expirt.to.OmniPlan.fromOmnifocus()", taskNames);
-
-        // console.log("omniplanScript = " + omniplanScript);
-        // omniplanScript.call((reply) => {
-        //     console.log("OmniPlan returned: " + reply);
-            console.log("done");
+            opFuncion.call((reply) => {
+                console.log("OmniPlan called: " + reply);
+            });
         }
 
     });
