@@ -3,7 +3,7 @@
   "targets": ["omnifocus"],
   "author": "Douglas Beal",
   "identifier": "ws.murderofcro.omnifocus.export.to.omniplan",  
-  "version": "1.1.6",
+  "version": "1.1.8",
   "description": "export Folder OmniPlan to OmniPlan",
   "label": "Export to OmniPlan",
   "shortLabel": "Export to OmniPlan",
@@ -14,8 +14,10 @@
   identifier needs to be unique
   match versions with import-omnifocus-to-omniplan.omnijs library
 */
+
+
 function convertDatebaseObject(dbo){
-    var obj = {}
+    var obj = {};
     var name = dbo.constructor.name;
     console.log("converting " + name);
     switch(name) {
@@ -99,23 +101,67 @@ function body(tagName) {
     return objs;
 }
 
-var _ = function() {
 
+var _ = function() {
+    let DEBUG = true;
     var action = new PlugIn.Action((selection, sender)=>{
+
         if( selection.folders.length == 1 ) {
-            dbobjs = selection.folders[0];
-            objs = convertDatebaseObject(dbobjs);
+
+            if( DEBUG ) {
+                PlugIn.all.map( (i)=>{
+                    console.log(i.URL);
+                    console.log(i.displayName);
+                    console.log(i.identifier);
+                    console.log(i.version.versionString);                    
+                    console.log(i.actions);
+
+                });
+
+            }
+            let dbobjs = selection.folders[0];
+            let objs = convertDatebaseObject(dbobjs);
+            let name = dbobjs.name;
+            let path = "/Users/dougbeal/Library/Mobile%20Documents/com~apple~CloudDocs/";
+
             
             json = JSON.stringify(objs);
-            console.log(json);
+            console.log(json.length);
 
-            
+
             encoded = encodeURIComponent(json);
-            let opFunction = URL.tellScript("omniplan", "ws.murderofcro.omniplan.import.fromOmnifocus()", encoded);
-            
-            opFuncion.call((reply) => {
-                console.log("OmniPlan called: " + reply);
-            });
+            console.log(encoded.length);
+
+            // try loading library explicitly?
+
+            let openAndSyncInOmniPlan = (path, name, data) => {
+                let urlString = "file://" + path + name + ".oplx";
+                console.log(urlString);
+                let url = URL.fromString(urlString); 
+                app.openDocument(null, url,
+                                 (result, wasOpen) => {
+                                     if( result instanceof Error ) {
+                                     } else {
+                                         fromOmniFocus(result, data); 
+                                     }
+                                 });
+            };                    
+            let opFunction = URL.tellScript("omniplan",
+                                            
+                                            `
+                                            console.log("in OmniPlan from OmniFocus"); 
+                                            console.log("current project: " + this.title);
+
+                                            (${openAndSyncInOmniPlan.toString()})("${path}","${name}","${encoded}");
+
+                                            console.log("after open/func");`
+                                           );
+            console.log("tellScript");
+            opFunction.call(
+                (reply) => { console.log("OmniPlan called: " + reply); },
+                (error) => { console.log("Error calling omniplan: " + error ); }                
+            );
+            console.log("after call");
         }
 
     });

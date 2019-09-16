@@ -4,28 +4,31 @@
   "targets": ["omniplan"],
   "author": "Douglas Beal",
   "identifier": "ws.murderofcro.omniplan.import",  
-  "version": "1.1.6",
+  "version": "1.1.8",
   "description": "import from OmniFocus",
   "label": "Export to OmniPlan",
   "shortLabel": "Export to OmniPlan",
   }*/
 
 /* 
-match versions with export-omnifocus-to-omniplay.omnijs
+match versions with export-omnifocus-to-omniplan.omnijs
 action
 */
 
-function fromOmnifocus(encodedJson) {
+function fromOmniFocus(document, encodedJson) {
     json = decodeURIComponent(encodedJson);
-    console.log("received json: " + json);
+    console.log("received json: " + json.length);
     obj = JSON.parse(json);
+    console.log(obj.name);
     return "called";
 }
 
 
 var _ = function() {
-    var lib = new PlugIn.Library(new Version("1.1.6"));
-    lib.fromOmnifocus = fromOmnifocus;
+    let version = new Version("1.1.8");
+    var lib = new PlugIn.Library(version);
+    console.log("import-omnifocus-to-omniplan version " + version);
+    lib.fromOmniFocus = fromOmniFocus;
     return lib;
 }();
 _;
